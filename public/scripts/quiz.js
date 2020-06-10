@@ -4,18 +4,38 @@ const questionText = document.querySelector(".question");
 const buttons = document.querySelectorAll(".answer");
 const scoreText = document.querySelector(".score");
 
-const questionSets = [
+const versusText = document.querySelector(".versus");
+
+const questionSet = [
     {
         question: "What is JavaScript?",
         correctAnswer: "A programming language",
 
-        incorrectAnswers: ["A car", "A dog", "A celebrity"]
+        incorrectAnswers: ["A subset of Java", "A dog", "A celebrity"]
     },
     {
         question: "Is Java the same as JavaScript?",
         correctAnswer: "No",
 
         incorrectAnswers: ["Yes", "Idk man", "Whatever"]
+    },
+    {
+        question: "What is the best browser?",
+        correctAnswer: "Internet Explorer",
+
+        incorrectAnswers: ["Chrome", "Firefox", "Edge"]
+    },
+    {
+        question: "Arrays start at?",
+        correctAnswer: "0",
+
+        incorrectAnswers: ["-1", "1", "it doesn't start"]
+    },
+    {
+        question: "Is HTML a programming language",
+        correctAnswer: "NOOOOO",
+
+        incorrectAnswers: ["No", "Nope", "Hell no"]
     }
 ];
 
@@ -23,8 +43,10 @@ let questionIndex = 0;
 let name = "";
 let score = 0;
 
+let quizEnded = false;
+
 random = (min, max) => {
-    return (Math.floor(Math.random() * max) + min);
+    return (Math.floor(Math.random() * (max + 1)) + min);
 }
 
 getUserName = () => {
@@ -32,43 +54,45 @@ getUserName = () => {
     socket.emit("new-user", name);
 }
 
-answerCorrectly = () => {
-    console.log("correct!");
+waitForAnotherUser = () => {
+    questionText.textContent = "Waiting to be matched...";
 
-    if (questionIndex < questionSets.length - 1) {
-        questionIndex++;
-        nextQuestion();
-    } else {
-        endQuiz();
-    }
+    buttons.forEach(button => {
+        button.textContent = "";
+    });
+}
+
+answerCorrectly = () => {
+    socket.emit("question-answered");
 
     score++;
     updateScore();
 }
 
 answerIncorrectly = () => {
-    if (questionIndex < questionSets.length - 1) {
-        questionIndex++;
-        nextQuestion();
-    } else {
-        endQuiz();
-    }
+
 }
 
 nextQuestion = () => {
-    questionText.textContent = questionSets[questionIndex].question;
+    questionText.textContent = questionSet[questionIndex].question;
 
     let correctIndex = random(0, 3);
     let incorrectIndex = 0;
 
     for (let i = 0; i < buttons.length; i++) {
         if (i === correctIndex) {
-            buttons[i].textContent = questionSets[questionIndex].correctAnswer;
+            buttons[i].textContent = questionSet[questionIndex].correctAnswer;
+
+            buttons[i].removeEventListener("click", answerCorrectly);
+            buttons[i].removeEventListener("click", answerIncorrectly);
 
             buttons[i].addEventListener("click", answerCorrectly);
         } else {
-            buttons[i].textContent = questionSets[questionIndex].incorrectAnswers[incorrectIndex];
+            buttons[i].textContent = questionSet[questionIndex].incorrectAnswers[incorrectIndex];
             incorrectIndex++;
+
+            buttons[i].removeEventListener("click", answerCorrectly);
+            buttons[i].removeEventListener("click", answerIncorrectly);
 
             buttons[i].addEventListener("click", answerIncorrectly);
         }
@@ -76,7 +100,7 @@ nextQuestion = () => {
 }
 
 updateScore = () => {
-    scoreText.textContent = "Your current score is " + score;
+    scoreText.textContent = "Your score is " + score;
 }
 
 endQuiz = () => {
@@ -85,12 +109,39 @@ endQuiz = () => {
     buttons.forEach(button => {
         button.remove();
     });
+
+    let restartButton = document.createElement("button");
+    restartButton.textContent = "Restart";
+    restartButton.addEventListener("click", () => {
+        location.reload();
+    });
+    
+    scoreText.append(restartButton);
+    quizEnded = true;
 }
 
 getUserName();
 updateScore();
 
+socket.on("wait", waitForAnotherUser);
+
 socket.on("start", (users) => {
     nextQuestion();
+    versusText.innerHTML = `<strong>${users[0]}</strong> vs. <strong>${users[1]}</strong>`;
 });
 
+socket.on("next-question", () => {
+    if (questionIndex < questionSet.length - 1) {
+        questionIndex++;
+        nextQuestion();
+    } else {
+        endQuiz();
+    }
+});
+
+socket.on("user-disconnect", (name) => {
+    if (!quizEnded) {
+        scoreText.textContent = `${name} disconnected`;
+        endQuiz();
+    }
+});

@@ -7,18 +7,29 @@ const server = http.createServer(app);
 const io = require("socket.io")(server);
 
 let users = {};
-let numberOfUsers = 0;
+let userNames = [];
 
 io.on("connection", (socket) => {
     socket.on("new-user", (name) => {
         users[socket.id] = name;
-        numberOfUsers++;
+        userNames.push(name);
 
-        if (numberOfUsers < 2) {
+        if (userNames.length != 2) {
             socket.emit("wait");
         } else {
-            io.sockets.emit("start", users);
+            io.sockets.emit("start", userNames);
         }
+        
+    });
+
+    socket.on("question-answered", () => {
+        io.sockets.emit("next-question");
+    });
+
+    socket.on("disconnect", () => {
+        socket.broadcast.emit("user-disconnect", users[socket.id]);
+
+        delete users[socket.id];
     });
 });
 
