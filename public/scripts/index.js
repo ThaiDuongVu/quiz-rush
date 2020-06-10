@@ -1,4 +1,4 @@
-let buttons = document.querySelectorAll(".quiz-button");
+let buttons = document.querySelectorAll(".quiz");
 
 buttons.forEach(button => {
     button.addEventListener("click", () => {

@@ -6,8 +6,20 @@ const server = http.createServer(app);
 
 const io = require("socket.io")(server);
 
+let users = {};
+let numberOfUsers = 0;
+
 io.on("connection", (socket) => {
-    
+    socket.on("new-user", (name) => {
+        users[socket.id] = name;
+        numberOfUsers++;
+
+        if (numberOfUsers < 2) {
+            socket.emit("wait");
+        } else {
+            io.sockets.emit("start", users);
+        }
+    });
 });
 
 app.use(express.static("public"));
