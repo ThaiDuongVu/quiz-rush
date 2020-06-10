@@ -1,6 +1,6 @@
 body {
     background-color: #1b262c;
-    color: #eeeeee;
+    color: #bbe1fa;
 
     font-family: "Roboto", sans-serif;
     text-align: center;
@@ -10,4 +10,34 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+}
+
+h1 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: normal;
+}
+
+p {
+    font-size: 1.5rem;
+}
+
+button {
+    background-color: #0f4c75;
+    color: #bbe1fa;
+
+    border: 5px solid #bbe1fa;
+    border-radius: 1rem;
+
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+
+    margin: 2rem;
+    padding: 1rem;
+}
+
+button:hover {
+    background-color: #bbe1fa;
+    color: #0f4c75;
+
+    border: 5px solid #0f4c75;
 }
