@@ -1,12 +1,22 @@
 const express = require("express");
+const http = require("http");
+
 const app = express();
+const server = http.createServer(app);
 
-const PORT = 3000 || process.env.PORT;
+const io = require("socket.io")(server);
 
-app.get("/", (req, res) => {
-    res.send("Hello World");
+io.on("connection", () => {
+
 });
 
+app.use(express.static("public"));
+
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/index.html");
+});
+
+const PORT = 3000 || process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
