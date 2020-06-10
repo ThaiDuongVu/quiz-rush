@@ -1,0 +1,16 @@
+{
+  "name": "quiz-rush",
+  "version": "1.0.0",
+  "description": "A quiz web application that matches you against other users",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon start"
+  },
+  "author": "Duong Vu",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4",
+    "socket.io": "^2.3.0"
+  }
+}
