@@ -26,6 +26,10 @@ io.on("connection", (socket) => {
         io.sockets.emit("next-question");
     });
 
+    socket.on("end-quiz", (score) => {
+        socket.broadcast.emit("compare-score", score);
+    });
+
     socket.on("disconnect", () => {
         socket.broadcast.emit("user-disconnect", users[socket.id]);
 

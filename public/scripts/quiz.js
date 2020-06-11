@@ -5,6 +5,7 @@ const buttons = document.querySelectorAll(".answer");
 const scoreText = document.querySelector(".score");
 
 const versusText = document.querySelector(".versus");
+const stateText = document.querySelector(".state");
 
 const questionSet = [
     {
@@ -45,6 +46,9 @@ let score = 0;
 
 let quizEnded = false;
 
+let correctStatements = ["Correct!", "Yes!", "Right!", "Nice!", "Perfect!", "Yeah!", "Amazing!", "Incredible!", "Fantastic!", "Great!"];
+let incorrectStatements = ["Incorrect!", "No!", "Wrong!", "Nope!", "False!", "Disappointing!"];
+
 random = (min, max) => {
     return (Math.floor(Math.random() * (max + 1)) + min);
 }
@@ -67,10 +71,12 @@ answerCorrectly = () => {
 
     score++;
     updateScore();
+    
+    stateText.textContent = correctStatements[random(0, correctStatements.length - 1)];
 }
 
 answerIncorrectly = () => {
-
+    stateText.textContent = incorrectStatements[random(0, incorrectStatements.length - 1)];
 }
 
 nextQuestion = () => {
@@ -118,6 +124,8 @@ endQuiz = () => {
     
     scoreText.append(restartButton);
     quizEnded = true;
+
+    socket.emit("end-quiz", score);
 }
 
 getUserName();
@@ -127,7 +135,9 @@ socket.on("wait", waitForAnotherUser);
 
 socket.on("start", (users) => {
     nextQuestion();
+
     versusText.innerHTML = `<strong>${users[0]}</strong> vs. <strong>${users[1]}</strong>`;
+    stateText.textContent = "Start!";
 });
 
 socket.on("next-question", () => {
@@ -136,6 +146,16 @@ socket.on("next-question", () => {
         nextQuestion();
     } else {
         endQuiz();
+    }
+});
+
+socket.on("compare-score", (otherScore) => {
+    if (score > otherScore) {
+        stateText.textContent = "You won!";
+    } else if (score < otherScore) {
+        stateText.textContent = "You lost!";
+    } else {
+        stateText.textContent = "It's a tie!";
     }
 });
 
