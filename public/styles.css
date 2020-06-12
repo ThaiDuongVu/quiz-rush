@@ -41,3 +41,11 @@ button:hover {
 
     border: 5px solid #0f4c75;
 }
+
+.green {
+    color: #66BB6A;
+}
+
+.red {
+    color: #f44336;
+}

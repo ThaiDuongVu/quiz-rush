@@ -73,10 +73,20 @@ answerCorrectly = () => {
     updateScore();
     
     stateText.textContent = correctStatements[random(0, correctStatements.length - 1)];
+
+    stateText.classList.remove("red");
+    stateText.classList.remove("green");
+
+    stateText.classList.add("green");
 }
 
 answerIncorrectly = () => {
     stateText.textContent = incorrectStatements[random(0, incorrectStatements.length - 1)];
+
+    stateText.classList.remove("red");
+    stateText.classList.remove("green");
+
+    stateText.classList.add("red");
 }
 
 nextQuestion = () => {
@@ -126,6 +136,9 @@ endQuiz = () => {
     quizEnded = true;
 
     socket.emit("end-quiz", score);
+
+    stateText.classList.remove("red");
+    stateText.classList.remove("green");
 }
 
 getUserName();
@@ -150,10 +163,17 @@ socket.on("next-question", () => {
 });
 
 socket.on("compare-score", (otherScore) => {
+    stateText.classList.remove("red");
+    stateText.classList.remove("green");
+
     if (score > otherScore) {
         stateText.textContent = "You won!";
+        stateText.classList.add("green");
+
     } else if (score < otherScore) {
         stateText.textContent = "You lost!";
+        stateText.classList.add("red");
+
     } else {
         stateText.textContent = "It's a tie!";
     }
